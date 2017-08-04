@@ -2,6 +2,7 @@
 package actors;
 
 import game.GameSpeedHandler;
+import game.ScoreHandler;
 import game.Stage;
 
 

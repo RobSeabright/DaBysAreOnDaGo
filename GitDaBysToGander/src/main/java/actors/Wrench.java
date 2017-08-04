@@ -1,7 +1,6 @@
 
 package actors;
 
-import game.GameSpeedHandler;
 import game.Stage;
 
 /**
@@ -31,11 +30,11 @@ public class Wrench extends Item {
     
     public void update(int gameTimer) {
             super.update(gameTimer);
-            updateYSpeed(gameTimer);
+            updateYSpeed();
     }
 
-    private void updateYSpeed(int gameTimer) {
-            posY += getVy() + GameSpeedHandler.getInstance().CalcSpeed(gameTimer);;
+    private void updateYSpeed() {
+            posY += getVy();
             if (posY > stage.getHeight()) setMarkedForRemoval(true);		
     }
 

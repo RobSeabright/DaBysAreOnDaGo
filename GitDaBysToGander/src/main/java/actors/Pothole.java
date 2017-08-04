@@ -1,7 +1,10 @@
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package actors;
 
-import game.GameSpeedHandler;
 import game.Stage;
 
 /**
@@ -31,11 +34,11 @@ public class Pothole extends Item {
     
     public void update(int gameTimer) {
             super.update(gameTimer);
-            updateYSpeed(gameTimer);
+            updateYSpeed();
     }
     
-    private void updateYSpeed(int gameTimer) {
-            posY += GameSpeedHandler.getInstance().CalcSpeed(gameTimer);
+    private void updateYSpeed() {
+            posY += getVy();
             if (posY > stage.getHeight()) setMarkedForRemoval(true);		
     }
     

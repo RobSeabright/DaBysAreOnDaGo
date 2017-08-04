@@ -17,16 +17,15 @@ public class GameSpeedHandler {
     private static float currentSpeed;
 
     private GameSpeedHandler() {
-        maxSpeed = 20f;
+        maxSpeed = 8f;
         maxFrames = 9000f;
-        currentSpeed = 4f;
+        currentSpeed = 1f;
     }
 
     public float CalcSpeed(float gameTimer) {
         
-        currentSpeed = 4.0f + (gameTimer / maxFrames) * (maxSpeed - 1.0f);
+        currentSpeed = 2.0f + (gameTimer / maxFrames) * (maxSpeed - 1.0f);
         currentSpeed = Math.min(currentSpeed, maxSpeed);
-
         return currentSpeed;
     }
 

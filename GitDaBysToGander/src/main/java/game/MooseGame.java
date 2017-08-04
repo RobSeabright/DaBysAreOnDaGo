@@ -26,6 +26,7 @@ import actors.Pothole;
 import actors.Wrench;
 import static game.Stage.HEIGHT;
 import static game.Stage.WIDTH;
+import static java.awt.SystemColor.menu;
 import java.io.IOException;
 
 import java.util.Random;
@@ -47,14 +48,19 @@ public class MooseGame extends Stage implements KeyListener, Runnable {
     private InputHandler keyReleasedHandler;
     private int gameTimer = 0;
     private int gameSpeed = 1;
-    private int spawnTimer = 0;
     private long usedTime;
 
     private BufferedImage background, backgroundTile;
     private int backgroundY;
-
-    Random rng = new Random();
     
+    public static enum STATE{
+        RUNNING,
+        PAUSE,
+        GAMEOVER
+    };
+    
+    STATE state = STATE.RUNNING;
+
     public MooseGame() {
         //init the UI
 
@@ -116,69 +122,88 @@ public class MooseGame extends Stage implements KeyListener, Runnable {
     }
 
     public void run() {
-        loopSound("gameMusic.wav");
+        if (state == STATE.RUNNING){
+            loopSound("gameMusic.wav");
 
-        usedTime = 0;
-        int spawnRate = 1;
+            Random rng = new Random();
+            usedTime = 0;
 
-        while (isVisible()) {
-            long startTime = System.currentTimeMillis();
-            gameTimer++;
-            spawnTimer++;
-           
-            if (spawnTimer > 200){
-                spawnRate++;
-                spawnTimer = 0;
-            }
-            
-            backgroundY -= GameSpeedHandler.getInstance().CalcSpeed(gameTimer);
-            if (backgroundY < 0) {
-                backgroundY = backgroundTile.getHeight();
-            }
+            while (isVisible()) {
+                gameTimer++;            
 
-            if (super.gameOver) {
-                paintGameOver();
-                //break;
-            }
-            else {
+                backgroundY -= GameSpeedHandler.getInstance().CalcSpeed(gameTimer);
+                if (backgroundY < 0) {
+                    backgroundY = backgroundTile.getHeight();
+                }
                 
                 score++;
-                
-                if (gameTimer > 2500 && gameTimer % 25 == 0){
-                    System.out.println("3");
-                    spawnActor();
+
+                if (actors.size() < 10) {
+                /* if (rng.nextInt(800 - Math.min(gameSpeed, 600)) == 1) {
+
+                    Actor pothole = new Pothole(this);
+                    pothole.setX(rng.nextInt(600) + 400);
+                    pothole.setY(0);
+                    pothole.setVy(gameSpeed);
+                    actors.add(pothole);
+                }*/
+
+                if (rng.nextInt(500 - gameSpeed) == 1) {
+
+                    Actor moose = new Moose(this);
+                    moose.setX(rng.nextInt(600) + 400);
+                    moose.setY(0);
+                    moose.setVy(gameSpeed);
+                    //moose.setVx(gameSpeed);
+                    actors.add(moose);
                 }
-                else if (gameTimer > 1250 && gameTimer % 50 == 0){
-                    System.out.println("2");
-                    spawnActor();
+                /*
+                if (rng.nextInt(1000 - gameSpeed) == 1) {
+
+                    Actor wrench = new Wrench(this);
+                    wrench.setX(rng.nextInt(600) + 400);
+                    wrench.setY(0);
+                    wrench.setVy(gameSpeed);
+                    actors.add(wrench);
+                }*/
                 }
-                else if (gameTimer > 10 && gameTimer % 110 == 0){
-                    System.out.println("1");
-                    spawnActor();
-                }
-                                
+
                 updateWorld();
                 paintWorld();
                 checkCollision(vehicle);
-            }
-
-            usedTime = System.currentTimeMillis() - startTime;
-
-            //calculate sleep time
-            if (usedTime == 0) {
-                usedTime = 1;
-            }
-            int timeDiff = (int) ((1000 / usedTime) - DESIRED_FPS);
-            if (timeDiff > 0) {
-                try {
-                    Thread.sleep(timeDiff / 75);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
-            }
+                System.out.println(gameTimer);
+                long startTime = System.currentTimeMillis();
+                usedTime = System.currentTimeMillis() - startTime;
 
+                //calculate sleep time
+                if (usedTime == 0) {
+                    usedTime = 1;
+                }
+                int timeDiff = (int) ((1000 / usedTime) - DESIRED_FPS);
+                if (timeDiff > 0) {
+                    try {
+                            Thread.sleep(timeDiff / 75);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                }
         }
+        else if (state == STATE.PAUSE){       
+            {
+            try {
+                Thread.sleep(999999);
+            } 
+            catch (InterruptedException ex) {
+                Logger.getLogger(MooseGame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            }
+        }
+        else if (state == STATE.GAMEOVER){
+            paintGameOver();
+        }      
     }
+    
 
     public void loopSound(final String name) {
         new Thread(new Runnable() {
@@ -186,36 +211,6 @@ public class MooseGame extends Stage implements KeyListener, Runnable {
                 ResourceLoader.getInstance().getSound(name).loop();
             }
         }).start();
-    }
-    
-    public void spawnActor(){
-        
-        int spawnType = rng.nextInt(100) % 8;
-        
-        switch(spawnType) {
-            case 0: case 1: case 2: case 3: 
-                Actor moose = new Moose(this);
-                moose.setX(rng.nextInt(800) + 200);
-                moose.setY(0);
-                moose.setVy(gameSpeed);
-                //moose.setVx(gameSpeed);
-                actors.add(moose);
-                break;
-            case 4: case 5: case 6:  
-                Actor pothole = new Pothole(this);
-                pothole.setX(rng.nextInt(800) + 200);
-                pothole.setY(0);
-                pothole.setVy(gameSpeed);
-                actors.add(pothole);
-                break;
-            case 7:
-                Actor wrench = new Wrench(this);
-                wrench.setX(rng.nextInt(800) + 200);
-                wrench.setY(0);
-                wrench.setVy(gameSpeed);
-                actors.add(wrench);
-                break;
-        }
     }
 
     public void updateWorld() {
@@ -239,7 +234,7 @@ public class MooseGame extends Stage implements KeyListener, Runnable {
         }
 
         if (vehicle.getHealth() < 1) {
-            this.endGame();
+            state = STATE.GAMEOVER;
         }
     }
 

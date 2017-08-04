@@ -29,6 +29,11 @@ public class InputHandler {
                     stage.initWorld();
                     //stage.game();
                 }
+            } else if (KeyEvent.VK_ESCAPE == event.getKeyCode()){
+                if (stage.gameOver || stage.gameWon){
+                    Menu menu = new Menu();
+                    menu.launchMenu();
+                }
             }
             else
                 player.triggerKeyPress(event);

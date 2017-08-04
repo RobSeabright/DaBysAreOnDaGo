@@ -28,7 +28,7 @@ public class Vehicle extends Actor implements KeyboardControllable {
         height = 207;
         posX = 800;
         posY = 550;
-        setHealth(4);
+        setHealth(11);
     }
     
     public void setHealth(int health){
